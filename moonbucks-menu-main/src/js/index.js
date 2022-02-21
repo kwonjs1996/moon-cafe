@@ -55,6 +55,16 @@ function App(){
         updateMenuCount();
         $("#espresso-menu-name").value = "";
       }
+      const updateMenuName = (e) => {
+        const $menuName = e.target.closest("li").querySelector(".menu-name")
+        const updatedMenuName = prompt(
+          "메뉴명을 수정하세요",
+           $menuName.innerText
+           //$menuName 만 입력했을 경우 [object HTMLSpanElement] 값이 나온다
+           //그래서 innerText를 사용한다 정도로 이해
+           );
+        $menuName.innerText = updatedMenuName;
+      }
 
 
     
@@ -67,14 +77,7 @@ function App(){
       //<li>태그로 추가되는 것들에게 이Event를 넣기 위해서 상위태그에 '위임'하는
       //방식으로 적용한다
       if (e.target.classList.contains("menu-edit-button")){
-        const $menuName = e.target.closest("li").querySelector(".menu-name")
-        const updatedMenuNme = prompt(
-          "메뉴명을 수정하세요",
-           $menuName.innerText
-           //$menuName 만 입력했을 경우 [object HTMLSpanElement] 값이 나온다
-           //그래서 innerText를 사용한다 정도로 이해
-           );
-        $menuName.innerText = updatedMenuNme;
+        updateMenuName(e);
       }
 
       if(e.target.classList.contains("menu-remove-button")){
