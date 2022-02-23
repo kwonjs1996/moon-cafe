@@ -30,13 +30,18 @@ const store = {
       localStorage.setItem("menu",JSON.stringify(menu));
   },
   getLocalStorage() {
-      localStorage.getItem("menu");
+      return localStorage.getItem("menu");
   },
 }
 
 function App(){
   // 상태는 변하는 데이터, 이 앱에서 변하는 것이 무엇인가 - 메뉴명
   this.menu = [];
+  this.init =  () => {
+    if (store.getLocalStorage().length > 1 ){
+      this.menu = store.getLocalStorage();
+    }
+  };
 
     //form태그가 자동으로 전송되는걸 막아준다
     $("#espresso-menu-form").addEventListener("submit", (e) => {
@@ -53,9 +58,9 @@ function App(){
       
         this.menu.push({ name: espressoMenuName });
         store.setLocalStorage(this.menu);
-        const template = this.menu.map((item) => {
+        const template = this.menu.map((item, index) => {
           return`
-          <li class="menu-list-item d-flex items-center py-2">
+          <li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
           <span class="w-100 pl-2 menu-name">${item.name}</span>
           <button
           type="button"
@@ -78,6 +83,7 @@ function App(){
         $("#espresso-menu-name").value = "";
       }
       const updateMenuName = (e) => {
+        const menuId = e.target.closest("li").dataset.menuId
         const $menuName = e.target.closest("li").querySelector(".menu-name")
         const updatedMenuName = prompt(
           "메뉴명을 수정하세요",
@@ -85,6 +91,8 @@ function App(){
            //$menuName 만 입력했을 경우 [object HTMLSpanElement] 값이 나온다
            //그래서 innerText를 사용한다 정도로 이해
            );
+        this.menu[menuId].name = updatedMenuName;
+        store.setLocalStorage(this.menu);
         $menuName.innerText = updatedMenuName;
       }
 
@@ -96,6 +104,9 @@ function App(){
     };
     const removeMenuName = (e) => {
       if (confirm("정말 삭제하시겠습니까?")){
+        const menuId = e.target.closest("li").dataset.menuId;
+        this.menu.splice(menuId, 1);
+        store.setLocalStorage(this.menu);
         e.target.closest("li").remove();
         // qurryselector 를 사용하지 않는 이유는 li 태그 전부를
         //삭제 해야 하기 때문
@@ -132,6 +143,7 @@ function App(){
 
 
     const app = new App();
+    app.init();
     //App();
 
 //TODO localstorage Read & Write
