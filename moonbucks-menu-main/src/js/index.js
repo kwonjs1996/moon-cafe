@@ -52,21 +52,21 @@ function App(){
   };
 
     //form태그가 자동으로 전송되는걸 막아준다
-    $("#espresso-menu-form").addEventListener("submit", (e) => {
+    $("#menu-form").addEventListener("submit", (e) => {
         e.preventDefault();
     });
 
     const addMenuname = () => {
-      if ($("#espresso-menu-name").value === ""){
+      if ($("#menu-name").value === ""){
         alert("값을 입력해주세요.");
         return;
       }
       
-        const espressoMenuName = $("#espresso-menu-name").value;
-        this.menu[this.currentCategory].push({ name : espressoMenuName });
+        const MenuName = $("#menu-name").value;
+        this.menu[this.currentCategory].push({ name : MenuName });
         store.setLocalStorage(this.menu);
         render();
-        $("#espresso-menu-name").value = "";
+        $("#menu-name").value = "";
       }
       const updateMenuName = (e) => {
         const menuId = e.target.closest("li").dataset.menuId
@@ -85,14 +85,15 @@ function App(){
 
     
     const updateMenuCount = () => {
-      const menuCount = $("#espresso-menu-list").querySelectorAll("li").length;
+      const menuCount = $("#menu-list").querySelectorAll("li").length;
         $(".menu-count").innerText = `총 ${menuCount} 개`
     };
     const render = () => {
-      const template = this.menu[this.currentCategory].map((item, index) => {
+      const template = this.menu[this.currentCategory]
+      .map((menuItem, index) => {
         return`
         <li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
-        <span class="w-100 pl-2 menu-name">${item.name}</span>
+        <span class="w-100 pl-2 menu-name">${menuItem.name}</span>
         <button
         type="button"
         class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
@@ -109,7 +110,7 @@ function App(){
       })
       .join("")
       
-    $("#espresso-menu-list").innerHTML = template;
+    $("#menu-list").innerHTML = template;
     updateMenuCount();
     }
 
@@ -125,7 +126,7 @@ function App(){
       }
     }
 
-    $("#espresso-menu-list").addEventListener("click", (e) => {
+    $("#menu-list").addEventListener("click", (e) => {
       //<li>태그로 추가되는 것들에게 이Event를 넣기 위해서 상위태그에 '위임'하는
       //방식으로 적용한다
       if (e.target.classList.contains("menu-edit-button")){
@@ -140,7 +141,7 @@ function App(){
     });
 
     //메뉴의 이름을 입력받는건
-   $("#espresso-menu-name").addEventListener("keypress", (e) =>{
+   $("#menu-name").addEventListener("keypress", (e) =>{
      if(e.key !== "Enter"){
        return
      }
@@ -149,7 +150,7 @@ function App(){
        addMenuname();
     });
 
-    $("#espresso-menu-submit-button").addEventListener("click", addMenuname);
+    $("#menu-submit-button").addEventListener("click", addMenuname);
     
     $("nav").addEventListener("click", (e) =>{
     const isCategoryButton = e.target.classList.contains("cafe-category-name");
@@ -157,6 +158,7 @@ function App(){
         const categoryName = e.target.dataset.categoryName;
         this.currentCategory = categoryName;
         $("#category-title").innerText = `${e.target.innerText} 메뉴 관리`;
+        render();
       }
     });
     
