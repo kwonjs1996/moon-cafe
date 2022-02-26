@@ -36,9 +36,16 @@ const store = {
 
 function App(){
   // 상태는 변하는 데이터, 이 앱에서 변하는 것이 무엇인가 - 메뉴명
-  this.menu = [];
+  this.menu = {
+    espresso : [],
+    prappuccino : [],
+    blended : [],
+    teavana : [],
+    desert : []
+  };
+  this.currentCategory = "espresso"
   this.init =  () => {
-    if (store.getLocalStorage().length > 0 ){
+    if (store.getLocalStorage()){
       this.menu = store.getLocalStorage();
     }
     render();
@@ -56,7 +63,7 @@ function App(){
       }
       
         const espressoMenuName = $("#espresso-menu-name").value;
-        this.menu.push({ name : espressoMenuName });
+        this.menu[this.currentCategory].push({ name : espressoMenuName });
         store.setLocalStorage(this.menu);
         render();
         $("#espresso-menu-name").value = "";
@@ -70,7 +77,7 @@ function App(){
            //$menuName 만 입력했을 경우 [object HTMLSpanElement] 값이 나온다
            //그래서 innerText를 사용한다 정도로 이해
            );
-        this.menu[menuId].name = updatedMenuName;
+        this.menu[this.currentCategory][menuId].name = updatedMenuName;
         store.setLocalStorage(this.menu);
         $menuName.innerText = updatedMenuName;
       }
@@ -82,7 +89,7 @@ function App(){
         $(".menu-count").innerText = `총 ${menuCount} 개`
     };
     const render = () => {
-      const template = this.menu.map((item, index) => {
+      const template = this.menu[this.currentCategory].map((item, index) => {
         return`
         <li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
         <span class="w-100 pl-2 menu-name">${item.name}</span>
@@ -109,7 +116,7 @@ function App(){
     const removeMenuName = (e) => {
       if (confirm("정말 삭제하시겠습니까?")){
         const menuId = e.target.closest("li").dataset.menuId;
-        this.menu.splice(menuId, 1);
+        this.menu[this.currentCategory].splice(menuId, 1);
         store.setLocalStorage(this.menu);
         e.target.closest("li").remove();
         // qurryselector 를 사용하지 않는 이유는 li 태그 전부를
@@ -143,13 +150,15 @@ function App(){
     });
 
     $("#espresso-menu-submit-button").addEventListener("click", addMenuname);
+    
     $("nav").addEventListener("click", (e) =>{
-    const isCategoryButton = e.target.classList.contains("cafe-category-name")
+    const isCategoryButton = e.target.classList.contains("cafe-category-name");
       if(isCategoryButton) {
         const categoryName = e.target.dataset.categoryName;
-        console.log(categoryName)
+        this.currentCategory = categoryName;
+        $("#category-title").innerText = `${e.target.innerText} 메뉴 관리`;
       }
-    })
+    });
     
 
     }
