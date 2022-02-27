@@ -38,7 +38,7 @@ function App(){
   // 상태는 변하는 데이터, 이 앱에서 변하는 것이 무엇인가 - 메뉴명
   this.menu = {
     espresso : [],
-    prappuccino : [],
+    frappuccino : [],
     blended : [],
     teavana : [],
     desert : []
