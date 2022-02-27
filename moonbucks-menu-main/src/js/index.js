@@ -23,16 +23,9 @@
     // - [ ] 확인 버튼을 클릭하면 메뉴가 삭제된다.
 
 
-const $ = (selector) => document.querySelector(selector);
+import { $ } from"./utils/dom.js";
+import store from "./store/index.js";
 
-const store = {
-  setLocalStorage(menu) {
-      localStorage.setItem("menu",JSON.stringify(menu));
-  },
-  getLocalStorage() {
-      return JSON.parse(localStorage.getItem("menu"));
-  },
-}
 
 function App(){
   // 상태는 변하는 데이터, 이 앱에서 변하는 것이 무엇인가 - 메뉴명
@@ -49,6 +42,7 @@ function App(){
       this.menu = store.getLocalStorage();
     }
     render();
+    initEnentListeners();
   };
 
     //form태그가 자동으로 전송되는걸 막아준다
@@ -79,13 +73,13 @@ function App(){
            );
         this.menu[this.currentCategory][menuId].name = updatedMenuName;
         store.setLocalStorage(this.menu);
-        $menuName.innerText = updatedMenuName;
+        render();
       }
 
 
     
     const updateMenuCount = () => {
-      const menuCount = $("#menu-list").querySelectorAll("li").length;
+      const menuCount = this.menu[this.currentCategory].length;
         $(".menu-count").innerText = `총 ${menuCount} 개`
     };
     const render = () => {
@@ -131,7 +125,7 @@ function App(){
         const menuId = e.target.closest("li").dataset.menuId;
         this.menu[this.currentCategory].splice(menuId, 1);
         store.setLocalStorage(this.menu);
-        e.target.closest("li").remove();
+        render();
         // qurryselector 를 사용하지 않는 이유는 li 태그 전부를
         //삭제 해야 하기 때문
         updateMenuCount();
@@ -144,47 +138,52 @@ function App(){
         !this.menu[this.currentCategory][menuId].soldOut;
       store.setLocalStorage(this.menu);
       render();  
-    }
-    $("#menu-list").addEventListener("click", (e) => {
-      //<li>태그로 추가되는 것들에게 이Event를 넣기 위해서 상위태그에 '위임'하는
-      //방식으로 적용한다
-      if (e.target.classList.contains("menu-edit-button")){
-        updateMenuName(e);
-        return;
-      }
+    };
 
-      if(e.target.classList.contains("menu-remove-button")){
-        removeMenuName(e);
-        return;     
-      }
-      if (e.target.classList.contains("menu-sold-out-button")){
-        soldOutMenu(e);
-        return;
-      }
+    const initEnentListeners = () => {
+      $("#menu-list").addEventListener("click", (e) => {
+        //<li>태그로 추가되는 것들에게 이Event를 넣기 위해서 상위태그에 '위임'하는
+        //방식으로 적용한다
+        if (e.target.classList.contains("menu-edit-button")){
+          updateMenuName(e);
+          return;
+        }
+  
+        if(e.target.classList.contains("menu-remove-button")){
+          removeMenuName(e);
+          return;     
+        }
+        if (e.target.classList.contains("menu-sold-out-button")){
+          soldOutMenu(e);
+          return;
+        }
+        
+      });
+  
+      //메뉴의 이름을 입력받는건
+     $("#menu-name").addEventListener("keypress", (e) =>{
+       if(e.key !== "Enter"){
+         return
+       }
+       
+  
+         addMenuname();
+      });
+  
+      $("#menu-submit-button").addEventListener("click", addMenuname);
       
-    });
+      $("nav").addEventListener("click", (e) =>{
+      const isCategoryButton = e.target.classList.contains("cafe-category-name");
+        if(isCategoryButton) {
+          const categoryName = e.target.dataset.categoryName;
+          this.currentCategory = categoryName;
+          $("#category-title").innerText = `${e.target.innerText} 메뉴 관리`;
+          render();
+        }
+      });
+    }
 
-    //메뉴의 이름을 입력받는건
-   $("#menu-name").addEventListener("keypress", (e) =>{
-     if(e.key !== "Enter"){
-       return
-     }
-     
-
-       addMenuname();
-    });
-
-    $("#menu-submit-button").addEventListener("click", addMenuname);
     
-    $("nav").addEventListener("click", (e) =>{
-    const isCategoryButton = e.target.classList.contains("cafe-category-name");
-      if(isCategoryButton) {
-        const categoryName = e.target.dataset.categoryName;
-        this.currentCategory = categoryName;
-        $("#category-title").innerText = `${e.target.innerText} 메뉴 관리`;
-        render();
-      }
-    });
     
 
     }
