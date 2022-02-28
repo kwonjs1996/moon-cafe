@@ -54,7 +54,7 @@ function App(){
         e.preventDefault();
     });
 
-    const addMenuname = () => {
+    const addMenuname = async () => {
       if ($("#menu-name").value === ""){
         alert("값을 입력해주세요.");
         return;
@@ -62,7 +62,7 @@ function App(){
       
         const menuName = $("#menu-name").value;
         
-        fetch(`${BASE_URL}/category/${this.currentCategory}/menu`, {
+        await fetch(`${BASE_URL}/category/${this.currentCategory}/menu`, {
           method: "POST",
           headers:{
             "Content-Type": "application/json",
@@ -76,12 +76,19 @@ function App(){
             console.log(data);
         });
 
-        //this.menu[this.currentCategory].push({ name : menuName });
-        //store.setLocalStorage(this.menu);
-        //render();
-        //$("#menu-name").value = "";
+        await fetch(`${BASE_URL}/category/${this.currentCategory}/menu`)
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            this.menu[this.currentCategory] = data;
+            render();
+            $("#menu-name").value = "";
+          });
+
+        
       }
-      const updateMenuName = (e) => {
+    const updateMenuName = (e) => {
         const menuId = e.target.closest("li").dataset.menuId
         const $menuName = e.target.closest("li").querySelector(".menu-name")
         const updatedMenuName = prompt(
