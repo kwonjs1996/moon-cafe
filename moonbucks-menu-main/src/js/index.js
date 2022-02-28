@@ -26,6 +26,10 @@
 import { $ } from"./utils/dom.js";
 import store from "./store/index.js";
 
+const BASE_URL = "http://localhost:3000/api"
+
+
+
 
 function App(){
   // 상태는 변하는 데이터, 이 앱에서 변하는 것이 무엇인가 - 메뉴명
@@ -56,11 +60,26 @@ function App(){
         return;
       }
       
-        const MenuName = $("#menu-name").value;
-        this.menu[this.currentCategory].push({ name : MenuName });
-        store.setLocalStorage(this.menu);
-        render();
-        $("#menu-name").value = "";
+        const menuName = $("#menu-name").value;
+        
+        fetch(`${BASE_URL}/category/${this.currentCategory}/menu`, {
+          method: "POST",
+          headers:{
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({name: menuName}),
+        })
+          .then((response) => {
+            return response.json();          
+        })
+          .then((data) => {
+            console.log(data);
+        });
+
+        //this.menu[this.currentCategory].push({ name : menuName });
+        //store.setLocalStorage(this.menu);
+        //render();
+        //$("#menu-name").value = "";
       }
       const updateMenuName = (e) => {
         const menuId = e.target.closest("li").dataset.menuId
