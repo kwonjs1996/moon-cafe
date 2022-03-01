@@ -26,9 +26,14 @@
 import { $ } from"./utils/dom.js";
 import store from "./store/index.js";
 
-const BASE_URL = "http://localhost:3000/api"
+const BASE_URL = "http://localhost:3000/api";
 
-
+const MenuApi = {
+  async getAllMenuByCategory(category) {
+    const reponse = await fetch(`${BASE_URL}/category/${category}/menu`);
+    return reponse.json();
+  },
+}
 
 
 function App(){
@@ -41,10 +46,11 @@ function App(){
     desert : []
   };
   this.currentCategory = "espresso"
-  this.init =  () => {
-    if (store.getLocalStorage()){
-      this.menu = store.getLocalStorage();
-    }
+  
+  this.init = async () => {
+      this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+      this.currentCategory
+      );
     render();
     initEnentListeners();
   };
@@ -71,23 +77,14 @@ function App(){
         })
           .then((response) => {
             return response.json();          
-        })
-          .then((data) => {
-            console.log(data);
         });
-
-        await fetch(`${BASE_URL}/category/${this.currentCategory}/menu`)
-          .then((response) => {
-            return response.json();
-          })
-          .then((data) => {
-            this.menu[this.currentCategory] = data;
+ 
+        this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+          this.currentCategory
+          );
             render();
             $("#menu-name").value = "";
-          });
-
-        
-      }
+          };
     const updateMenuName = (e) => {
         const menuId = e.target.closest("li").dataset.menuId
         const $menuName = e.target.closest("li").querySelector(".menu-name")
