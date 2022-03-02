@@ -45,6 +45,19 @@ const MenuApi = {
       console.error("에러가 발생했습니다.");
     }
   },
+  async updateMenu(category, name, menuId) {
+    const response = await fetch(`${BASE_URL}/category/${category}/menu/${menuId}`,{
+      method: "PUT",
+      headers:{
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name }),
+    })
+    if(!response){
+      console.error("에러가 발생했습니다.")
+    }
+    return response.json();
+  }
 };
 
 
@@ -86,7 +99,7 @@ function App(){
         render();
         $("#menu-name").value = "";
       };
-    const updateMenuName = (e) => {
+    const updateMenuName = async(e) => {
         const menuId = e.target.closest("li").dataset.menuId
         const $menuName = e.target.closest("li").querySelector(".menu-name")
         const updatedMenuName = prompt(
@@ -95,8 +108,10 @@ function App(){
            //$menuName 만 입력했을 경우 [object HTMLSpanElement] 값이 나온다
            //그래서 innerText를 사용한다 정도로 이해
            );
-        this.menu[this.currentCategory][menuId].name = updatedMenuName;
-        store.setLocalStorage(this.menu);
+        await MenuApi.updateMenu(this.currentCategory, updatedMenuName, menuId)
+        this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+          this.currentCategory
+        );
         render();
       }
 
@@ -110,7 +125,9 @@ function App(){
       const template = this.menu[this.currentCategory]
       .map((menuItem, index) => {
         return`
-        <li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
+        <li data-menu-id="${
+          menuItem.id
+        }" class="menu-list-item d-flex items-center py-2">
         <span class="w-100 pl-2 menu-name ${
           menuItem.soldOut ? "sold-out" : ""
         }">${menuItem.name}</span>
