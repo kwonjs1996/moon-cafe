@@ -30,8 +30,8 @@ const BASE_URL = "http://localhost:3000/api";
 
 const MenuApi = {
   async getAllMenuByCategory(category) {
-    const reponse = await fetch(`${BASE_URL}/category/${category}/menu`);
-    return reponse.json();
+    const response = await fetch(`${BASE_URL}/category/${category}/menu`);
+    return response.json();
   },
   async createMenu(category, name){
     const response = await fetch(`${BASE_URL}/category/${category}/menu`, {
@@ -53,7 +53,7 @@ const MenuApi = {
       },
       body: JSON.stringify({ name }),
     })
-    if(!response){
+    if(!response.ok){
       console.error("에러가 발생했습니다.")
     }
     return response.json();
@@ -65,12 +65,20 @@ const MenuApi = {
         method: "PUT",
       }
     );
-    if (!response){
+    if (!response.ok){
        console.error("에러가 발생했습니다.")
     } 
   },
+  async deleteMenu(category, menuId) {
+    const response = await fetch(
+      `${BASE_URL}/category/${category}/menu/${menuId}`,{
+        method: "DELETE",
+    });
+    if (!response.ok){
+      console.error("에러가 발생했습니다.");
+    }
+  }
 };
-
 
 function App(){
   // 상태는 변하는 데이터, 이 앱에서 변하는 것이 무엇인가 - 메뉴명
@@ -170,11 +178,14 @@ function App(){
     updateMenuCount();
     }
 
-    const removeMenuName = (e) => {
+    const removeMenuName = async (e) => {
       if (confirm("정말 삭제하시겠습니까?")){
         const menuId = e.target.closest("li").dataset.menuId;
-        this.menu[this.currentCategory].splice(menuId, 1);
-        store.setLocalStorage(this.menu);
+        await MenuApi.deleteMenu(this.currentCategory, menuId);
+        this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+          this.currentCategory);
+        //this.menu[this.currentCategory].splice(menuId, 1);
+        //store.setLocalStorage(this.menu);
         render();
         // qurryselector 를 사용하지 않는 이유는 li 태그 전부를
         //삭제 해야 하기 때문
