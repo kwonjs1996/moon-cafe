@@ -59,7 +59,6 @@ function App(){
         const duplicateItem = this.menu[this.currentCategory].find(
           (menuItem) => menuItem.name === $("#menu-name").value
         );
-        console.log(duplicateItem);
         if (duplicateItem) {
           alert("이미 등록된 메뉴입니다. 다시 입력해주세요.");
           $("#menu-name").value = "";
